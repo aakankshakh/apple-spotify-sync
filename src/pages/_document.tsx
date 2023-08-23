@@ -2,7 +2,7 @@ import { Html, Head, Main, NextScript } from 'next/document'
 
 export default function Document() {
   return (
-    <Html lang="en" className='bg-[#f97234] text-[#000000]'>
+    <Html lang="en" className='bg-white text-black'>
       <Head />
       <body>
         <Main />
