@@ -1,6 +1,7 @@
 export type playlist = {
   id: string;
   name: string;
+  songs: song[];
   created_at: Date | undefined;
   deleted_at: Date | undefined;
   updated_at: Date | undefined;
@@ -19,8 +20,28 @@ export type sync = {
   created_at: Date | undefined;
 };
 
-export type ResponseObj = {
-  object: "playlist" | "song" | "sync";
-  data: playlist | song | sync | undefined;
-  error: string | undefined;
+type playlistRespone = {
+  object: "playlist";
+  data: playlist;
+  error: undefined;
 };
+type songResponse = {
+  object: "song";
+  data: song;
+  error: undefined;
+};
+type syncResponse = {
+  object: "sync";
+  data: sync;
+  error: undefined;
+};
+type errorResponse = {
+  object: "playlist" | "song" | "sync";
+  data: undefined;
+  error: string;
+};
+export type ResponseObject =
+  | playlistRespone
+  | songResponse
+  | syncResponse
+  | errorResponse;
