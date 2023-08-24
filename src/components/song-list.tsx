@@ -20,7 +20,7 @@ const SongList = (props: SongListProps) => {
 
       <ul className="space-y-2">
         {songs.map((song, i) => (
-          <Song song={song} key={i} />
+          <Song song={song} index={i} key={i} />
         ))}
       </ul>
     </div>
