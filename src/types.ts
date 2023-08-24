@@ -8,8 +8,10 @@ export type playlist = {
   updated_at: Date | undefined;
 };
 export type song = {
+  albumImage: string;
   name: string;
   artist: string;
+  duration: number; //in seconds
 };
 export type sync = {
   user_one: string;
