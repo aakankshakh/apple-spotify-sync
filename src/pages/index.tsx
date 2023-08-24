@@ -45,9 +45,14 @@ export default function Home() {
         </svg>
       </div>
       <div className="text-center">
-        <h1 className="text-6xl inline-flex h-20 pt-2 overflow-x-hidden animate-type group-hover:animate-type-reverse whitespace-nowrap text-brand-accent will-change-transform">
-          Playlist Sync
-        </h1>
+        <div className="flex flex-row items-center justify-center space-x-0">
+          <h1 className="text-6xl inline-flex h-20 pt-2 overflow-x-hidden animate-type group-hover:animate-type-reverse whitespace-nowrap text-brand-accent will-change-transform">
+            Playlist Sync
+          </h1>
+          <h1 className="text-6xl inline-flex h-[40px] leading-[36px] font-bold animate-[pulse_0.75s_ease-in-out_infinite]">
+            |
+          </h1>
+        </div>
         <p>
           Share your favourite playlist with your friends and have it sync
           almost instantaneously!

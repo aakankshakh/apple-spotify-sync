@@ -21,7 +21,7 @@ const config: Config = {
           "65%, 70%": { width: "7ch" },
           "75%, 80%": { width: "8ch" },
           "85%, 90%": { width: "9ch" },
-          "95%": { width: "10ch" },
+          "95%": { width: "9ch" },
         },
       },
     },
