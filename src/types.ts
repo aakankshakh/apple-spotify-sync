@@ -10,6 +10,7 @@ export type playlist = {
 export type song = {
   name: string;
   artist: string;
+  duration: number;
 };
 export type sync = {
   user_one: string;

@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { ResponseObject, playlist } from "@/types";
 import SongList from "@/components/song-list";
+import { getPlaylist } from "@/lib/client/crud";
 
 export default function PlaylistPage() {
   const router = useRouter();
@@ -11,27 +12,25 @@ export default function PlaylistPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | undefined>(undefined);
 
-  const fetchPlaylist = async (id: string) => {
-    const res = await fetch(`/api/playlist?id=${id}`);
-    const data = (await res.json()) as ResponseObject;
+  useEffect(() => {
+    if (id === undefined) return;
 
-    if (data.error !== undefined) {
-      console.error("Error:", data.error);
-      setError(data.error);
-    } else if (data.object !== "playlist") {
-      console.error("Error: Received non-playlist object:", data);
-      setError("Received non-playlist object");
-    } else {
-      setPlaylist(data.data);
-      setError(undefined);
-    }
-
-    setLoading(false);
-  };
+    getPlaylist(
+      id as string,
+      (err) => {
+        setError(err);
+        setLoading(false);
+      },
+      (playlist) => {
+        setPlaylist(playlist);
+        setLoading(false);
+      }
+    );
+  }, [id]);
 
   useEffect(() => {
-    if (id !== undefined) fetchPlaylist(id as string);
-  }, [id]);
+    console.log("Songs:", playlist?.songs || []);
+  }, [playlist]);
 
   return (
     <main className="flex min-h-screen flex-row items-center justify-center p-24">

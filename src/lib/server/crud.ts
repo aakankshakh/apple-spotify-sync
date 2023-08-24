@@ -3,8 +3,7 @@ import { playlist, sync } from "@/types";
 
 export async function createPlaylist(playlist: playlist): Promise<void> {
   try {
-    const rowCount = await kv.set(`playlist:${playlist.id}`, playlist);
-    console.log(`Inserted ${rowCount} row(s)`);
+    await kv.set(`playlist:${playlist.id}`, playlist);
   } catch (error) {
     // Handle errors
   }
@@ -13,15 +12,13 @@ export async function createPlaylist(playlist: playlist): Promise<void> {
 /**
  * Retrieve an existing playlist from the database
  */
-export async function getPlaylist(id: string): Promise<playlist | null> {
+export async function getPlaylist(id: string): Promise<playlist | undefined> {
   try {
-    const playlistData: playlist | null | undefined = await kv.get(
-      `playlist:${id}`
-    );
-    return playlistData ? JSON.parse(JSON.stringify(playlistData)) : null;
+    const playlistData = await kv.get<playlist>(`playlist:${id}`);
+    return playlistData ? playlistData : undefined;
   } catch (error) {
     // Handle errors
-    return null;
+    return undefined;
   }
 }
 
@@ -107,12 +104,12 @@ export async function updateSync(
 /**
  * Retrieve an existing sync from the database
  */
-export async function getSync(playlist_id: string): Promise<sync | null> {
+export async function getSync(playlist_id: string): Promise<sync | undefined> {
   try {
-    const syncData = await kv.get(`sync:${playlist_id}`);
-    return syncData ? JSON.parse(JSON.stringify(syncData)) : null;
+    const syncData = await kv.get<sync>(`sync:${playlist_id}`);
+    return syncData ? syncData : undefined;
   } catch (error) {
     // Handle errors
-    return null;
+    return undefined;
   }
 }
