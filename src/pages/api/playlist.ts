@@ -3,6 +3,13 @@ import { v4 as uuidv4 } from "uuid";
 import { createPlaylist, getPlaylist } from "@/lib/server/crud";
 import { ResponseObject, playlist } from "@/types";
 
+/**
+ * Handle requests to /api/playlist as follows:
+ *
+ * GET: Retrieve an existing playlist from the database
+ *
+ * POST: Create a new playlist in the database
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseObject>

@@ -1,10 +1,11 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { ResponseObject, playlist } from "@/types";
+import SongList from "@/components/song-list";
 
 export default function PlaylistPage() {
   const router = useRouter();
-  const { playlistId } = router.query;
+  const { id } = router.query;
 
   const [playlist, setPlaylist] = useState<playlist | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(true);
@@ -28,17 +29,18 @@ export default function PlaylistPage() {
   };
 
   useEffect(() => {
-    fetchPlaylist(playlistId as string);
-  }, [playlistId]);
+    fetchPlaylist(id as string);
+  }, [id]);
 
   return (
-    <main className="flex min-h-screen flex-row items-center justify-between p-24">
+    <main className="flex min-h-screen flex-row items-center justify-center p-24">
       {loading && <h1 className="text-3xl">Loading...</h1>}
       {error && <h1 className="text-3xl">Error: {error}</h1>}
       {playlist && (
-        <>
-          <h1 className="text-3xl">{playlist.name}</h1>
-        </>
+        <div className="flex flex-col items-center space-y-4">
+          <h1 className="text-4xl font-bold">{playlist.name}</h1>
+          <SongList songs={playlist.songs} />
+        </div>
       )}
     </main>
   );
