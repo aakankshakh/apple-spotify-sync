@@ -23,13 +23,14 @@ export default function PlaylistPage() {
       setError("Received non-playlist object");
     } else {
       setPlaylist(data.data);
+      setError(undefined);
     }
 
     setLoading(false);
   };
 
   useEffect(() => {
-    fetchPlaylist(id as string);
+    if (id !== undefined) fetchPlaylist(id as string);
   }, [id]);
 
   return (
