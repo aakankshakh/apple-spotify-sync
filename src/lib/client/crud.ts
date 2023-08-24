@@ -48,16 +48,19 @@ export const createTest = async () => {
       songs: [
         {
           name: "Washing Machine Heart",
+          albumImage: "",
           artist: "Mitski",
           duration: 128,
         },
         {
           name: "The Less I Know The Better",
+          albumImage: "",
           artist: "Tame Impala",
           duration: 167,
         },
         {
           name: "Freaking Out The Neighborhood",
+          albumImage: "",
           artist: "Mac DeMarco",
           duration: 218,
         },
