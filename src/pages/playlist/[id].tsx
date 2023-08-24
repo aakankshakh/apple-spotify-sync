@@ -44,7 +44,8 @@ export default function PlaylistPage() {
           </h4>
           <h1 className="mt-0 mb-2 text-white text-4xl">{playlist.name}</h1>
           <p className="text-gray-600 text-sm">
-            Created on {playlist.created_at} - Updated on {playlist.updated_at}
+            Created on {playlist.created_at?.toDateString()} - Updated on{" "}
+            {playlist.updated_at?.toDateString()}
             {numSongs} songs, 3 hr 2 min
           </p>
 
