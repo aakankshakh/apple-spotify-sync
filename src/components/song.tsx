@@ -3,10 +3,11 @@ import { song } from "../types";
 
 interface SongProps {
   song: song;
+  index: number;
 }
 
 const Song = (props: SongProps) => {
-  const { song } = props;
+  const { song, index } = props;
   const seconds = song.duration % 60;
   const minutes = (song.duration - seconds) / 60;
   const duration: string = minutes + ":" + seconds;
