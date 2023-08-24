@@ -1,8 +1,51 @@
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-row items-center justify-center p-24">
+    <main className="flex min-h-screen flex-col items-center justify-center p-24">
+      <div className="h-20 w-20">
+        <svg
+          className="fill-black dark:fill-white "
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <rect
+            className="spinner_7uc5 spinner_ZAxd"
+            x="1"
+            y="6"
+            width="2.8"
+            height="12"
+          />
+          <rect
+            className="spinner_7uc5 spinner_RibN"
+            x="5.8"
+            y="6"
+            width="2.8"
+            height="12"
+          />
+          <rect
+            className="spinner_7uc5"
+            x="10.6"
+            y="6"
+            width="2.8"
+            height="12"
+          />
+          <rect
+            className="spinner_7uc5 spinner_RibN"
+            x="15.4"
+            y="6"
+            width="2.8"
+            height="12"
+          />
+          <rect
+            className="spinner_7uc5 spinner_ZAxd"
+            x="20.2"
+            y="6"
+            width="2.8"
+            height="12"
+          />
+        </svg>
+      </div>
       <div className="text-center">
-        <h1 className="text-4xl inline-flex h-20 pt-2 overflow-x-hidden animate-type group-hover:animate-type-reverse whitespace-nowrap text-brand-accent will-change-transform">
+        <h1 className="text-6xl inline-flex h-20 pt-2 overflow-x-hidden animate-type group-hover:animate-type-reverse whitespace-nowrap text-brand-accent will-change-transform">
           Playlist Sync
         </h1>
         <p>
