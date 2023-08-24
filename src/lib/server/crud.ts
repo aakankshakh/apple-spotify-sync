@@ -3,7 +3,8 @@ import { playlist, sync } from "@/types";
 
 export async function createPlaylist(playlist: playlist): Promise<void> {
   try {
-    await kv.hset(`playlist:${playlist.id}`, playlist);
+    const rowCount = await kv.set(`playlist:${playlist.id}`, playlist);
+    console.log(`Inserted ${rowCount} row(s)`);
   } catch (error) {
     // Handle errors
   }
@@ -14,9 +15,8 @@ export async function createPlaylist(playlist: playlist): Promise<void> {
  */
 export async function getPlaylist(id: string): Promise<playlist | null> {
   try {
-    const playlistData: playlist | null | undefined = await kv.hget(
-      `playlist:${id}`,
-      "playlist"
+    const playlistData: playlist | null | undefined = await kv.get(
+      `playlist:${id}`
     );
     return playlistData ? JSON.parse(JSON.stringify(playlistData)) : null;
   } catch (error) {
@@ -34,7 +34,7 @@ export async function deletePlaylist(id: string): Promise<void> {
     const playlist = await getPlaylist(id);
     if (playlist) {
       const newPlaylist = { ...playlist, deleted_at: today };
-      await kv.hset(`playlist:${id}`, newPlaylist);
+      await kv.set(`playlist:${id}`, newPlaylist);
     }
   } catch (error) {
     // Handle errors
@@ -52,7 +52,7 @@ export async function updatePlaylist(
     const currentPlaylist = await getPlaylist(id);
     if (currentPlaylist) {
       const newPlaylist = { ...currentPlaylist, ...updatedPlaylist };
-      await kv.hset(`playlist:${id}`, newPlaylist);
+      await kv.set(`playlist:${id}`, newPlaylist);
     }
   } catch (error) {
     // Handle errors
@@ -64,7 +64,7 @@ export async function updatePlaylist(
  */
 export async function createSync(sync: sync): Promise<void> {
   try {
-    await kv.hset(`sync:${sync.playlist_id}`, sync);
+    await kv.set(`sync:${sync.playlist_id}`, sync);
   } catch (error) {
     // Handle errors
   }
@@ -79,7 +79,7 @@ export async function deleteSync(playlist_id: string): Promise<void> {
     const sync = await getSync(playlist_id);
     if (sync) {
       const newSync = { ...sync, deleted_at: today };
-      await kv.hset(`sync:${playlist_id}`, newSync);
+      await kv.set(`sync:${playlist_id}`, newSync);
     }
   } catch (error) {
     // Handle errors
@@ -97,7 +97,7 @@ export async function updateSync(
     const currentSync = await getSync(playlist_id);
     if (currentSync) {
       const newSync = { ...currentSync, ...updatedSync };
-      await kv.hset(`sync:${playlist_id}`, newSync);
+      await kv.set(`sync:${playlist_id}`, newSync);
     }
   } catch (error) {
     // Handle errors
@@ -109,7 +109,7 @@ export async function updateSync(
  */
 export async function getSync(playlist_id: string): Promise<sync | null> {
   try {
-    const syncData = await kv.hget(`sync:${playlist_id}`, "sync");
+    const syncData = await kv.get(`sync:${playlist_id}`);
     return syncData ? JSON.parse(JSON.stringify(syncData)) : null;
   } catch (error) {
     // Handle errors
