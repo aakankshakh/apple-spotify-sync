@@ -12,7 +12,6 @@ const SongList = (props: SongListProps) => {
     <div>
       <div className="flex text-gray-600">
         <div className="p-2 w-8 flex-shrink-0"></div>
-        <div className="p-2 w-8 flex-shrink-0"></div>
         <div className="p-2 w-full">Title</div>
         <div className="p-2 w-full">Artist</div>
         <div className="p-2 w-12 flex-shrink-0 text-right">⏱</div>
