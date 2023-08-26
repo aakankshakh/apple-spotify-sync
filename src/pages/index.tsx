@@ -1,5 +1,12 @@
 import { useSession, signIn, signOut } from "next-auth/react";
 import { useRef } from "react";
+import { useEventListener } from "usehooks-ts";
+
+declare global {
+  interface WindowEventMap {
+    musickitloaded: CustomEvent;
+  }
+}
 
 export default function Home() {
   const { update, data, status } = useSession();
@@ -9,6 +16,21 @@ export default function Home() {
       cursorRef.current.remove();
     }
   }, 3000);
+
+  useEventListener("musickitloaded", () => {
+    fetch("/api/token")
+      .then((res) => res.json())
+      .then(({ token }: { token: string }) => {
+        // @ts-ignore
+        window.MusicKit.configure({
+          developerToken: token,
+          app: {
+            name: "MusicKit Web App",
+            build: "1978.4.1",
+          },
+        });
+      });
+  });
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24">
