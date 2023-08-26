@@ -38,8 +38,9 @@ export default function PlaylistPage() {
       .map((song) => song.duration)
       .reduce((partialSum, a) => partialSum + a, 0) || 0;
 
-  const durationMinutes = Math.round((totalDuration % 3600) / 60);
   const durationHours = Math.floor(totalDuration / 3600);
+  const durationMinutes = Math.round((totalDuration % 3600) / 60);
+  const formattedDuration = `${durationHours} hr ${durationMinutes} min`;
 
   return (
     <main className="p-24 w-screen">
@@ -66,12 +67,15 @@ export default function PlaylistPage() {
             </button>
           </div>
           <p className="text-gray-600 text-m">
-            {numSongs} songs, {durationHours} hr {durationMinutes} min
+            {numSongs} songs, {formattedDuration}
           </p>
           <p className="text-gray-600 text-sm pb-5">
-            Updated on {dateFormat(playlist.updated_at, "dddd, mmmm dS, yyyy")}
+            Last synced:{" "}
+            {dateFormat(playlist.updated_at, "dddd, mmmm dS, yyyy")}
+            {/*
             {"   -   "}
-            Created on {dateFormat(playlist.created_at, "dddd, mmmm dS, yyyy")}
+            Created: {dateFormat(playlist.created_at, "dddd, mmmm dS, yyyy")}
+      */}
           </p>
 
           <SongList songs={playlist.songs} />

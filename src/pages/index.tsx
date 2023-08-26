@@ -1,6 +1,8 @@
+import { useSession, signIn, signOut } from "next-auth/react";
 import { useRef } from "react";
 
 export default function Home() {
+  const { update, data, status } = useSession();
   const cursorRef = useRef<HTMLHeadingElement>(null);
   setTimeout(() => {
     if (cursorRef.current) {

@@ -14,11 +14,11 @@ const Song = (props: SongProps) => {
   const duration: string = minutes + ":" + secondsString;
 
   return (
-    <li className="flex border-b border-gray-800 hover:bg-gray-800">
-      <div className="p-3 w-8 flex-shrink-0 text-gray-600">{index + 1}</div>
-      <div className="p-3 w-full">{song.name}</div>
-      <div className="p-3 w-full">{song.artist}</div>
-      <div className="p-3 w-12 flex-shrink-0 text-right">{duration}</div>
+    <li className="flex border-b border-gray-800 hover:bg-gray-800 p-3">
+      <div className="w-8 flex-shrink-0 text-gray-600">{index + 1}</div>
+      <div className="w-full">{song.name}</div>
+      <div className="w-full">{song.artist}</div>
+      <div className="w-12 flex-shrink-0 text-right">{duration}</div>
     </li>
   );
 };
