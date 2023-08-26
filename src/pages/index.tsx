@@ -175,9 +175,8 @@ export default function Home() {
             <table className="table-auto">
               <thead>
                 <tr>
+                  <th className="px-4 py-2"></th>
                   <th className="px-4 py-2">Name</th>
-                  <th className="px-4 py-2">Artist</th>
-                  <th className="px-4 py-2">Duration</th>
                 </tr>
               </thead>
               <tbody>
@@ -191,7 +190,6 @@ export default function Home() {
                       />
                     </td>
                     <td className="border px-4 py-2">{playlist.name}</td>
-                    <td className="border px-4 py-2">{playlist.duration}</td>
                   </tr>
                 ))}
               </tbody>
