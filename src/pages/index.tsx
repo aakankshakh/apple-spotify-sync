@@ -114,6 +114,7 @@ export default function Home() {
           <button
             type="button"
             className="text-white bg-[#050708] dark:bg-[#777474] hover:bg-[#050708]/90 dark:hover:bg-[#777474]/60 focus:ring-4 focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#050708]/50 m-3"
+            onClick={() => signIn("spotify")}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
