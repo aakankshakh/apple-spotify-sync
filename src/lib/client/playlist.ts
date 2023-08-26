@@ -82,7 +82,7 @@ const getSpotifyPlaylists = async (userToken: string, page: number = 0) => {
         })
           .then((res) => res.json())
           .then((data) => {
-            return {
+            const newPlaylist = {
               ...playlist,
               tracks: data.items.map((item: any) => {
                 return {
@@ -95,6 +95,8 @@ const getSpotifyPlaylists = async (userToken: string, page: number = 0) => {
                 };
               }),
             };
+
+            return newPlaylist;
           })
       )
     )
