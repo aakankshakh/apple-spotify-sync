@@ -1,5 +1,21 @@
+import { song } from "@/types";
+
+type Platform = "apple" | "spotify";
+export type UnifiedSong = {
+  artists: string[];
+  id: string;
+  name: string;
+  type: Platform;
+};
+export type UnifiedPlaylist = {
+  id: string;
+  imageURL: string;
+  name: string;
+  tracks?: song[];
+  type: Platform;
+};
 export const getUserPlaylists = async (
-  type: "spotify" | "apple",
+  type: Platform,
   token: string,
   devToken: string
 ) => {
@@ -8,10 +24,37 @@ export const getUserPlaylists = async (
     : getApplePlaylists(token, devToken);
 };
 
-const getApplePlaylists = async (userToken: string, devToken: string) => {
-  const relations = encodeURI("entries,artwork");
+type ApplePlaylist = {
+  next: string;
+  data: {
+    id: string;
+    type: "library-playlists";
+    href: string;
+    attributes: {
+      lastModifiedDate: string;
+      canEdit: boolean;
+      name: string;
+      isPublic: boolean;
+      hasCatalog: boolean;
+      dateAdded: string;
+      playParams: {
+        id: string;
+        kind: "playlist";
+        isLibrary: boolean;
+        globalId: string;
+      };
+    };
+  }[];
+  meta: {
+    total: number;
+  };
+};
+const getApplePlaylists = async (
+  userToken: string,
+  devToken: string
+): Promise<UnifiedPlaylist[]> => {
   return fetch(
-    `https://api.music.apple.com/v1/me/library/playlists?include=${relations}`,
+    `https://api.music.apple.com/v1/me/library/playlists?extend=attributes`,
     {
       headers: {
         Authorization: `Bearer ${devToken}`,
@@ -21,7 +64,11 @@ const getApplePlaylists = async (userToken: string, devToken: string) => {
   )
     .then((res) => res.json())
     .then((data) => data.data)
-    .then((playlists) => {})
+    .then((playlists: ApplePlaylist[]) => {
+      playlists.map((playlist) => {
+        console.log(playlist);
+      });
+    })
     .catch((err) => console.error(err));
 };
 
@@ -62,7 +109,10 @@ type SpotifyPlaylist = {
   type: string;
   uri: string;
 };
-const getSpotifyPlaylists = async (userToken: string, page: number = 0) => {
+const getSpotifyPlaylists = async (
+  userToken: string,
+  page: number = 0
+): Promise<UnifiedPlaylist[]> => {
   const per_page = 50;
   const composed_url = `https://api.spotify.com/v1/me/playlists?offset=${
     50 * page
@@ -87,10 +137,11 @@ const getSpotifyPlaylists = async (userToken: string, page: number = 0) => {
         })
           .then((res) => res.json())
           .then((data) => {
-            const newPlaylist = {
-              ...playlist,
-              tracks: data.items.map((item: any) => {
-                return {
+            const transformedPlaylist: UnifiedPlaylist = {
+              id: playlist.id,
+              imageURL: playlist.images[0].url,
+              songs: data.items.map((item) => {
+                const transformedSong: UnifiedSong = {
                   id: item.track.id,
                   name: item.track.name,
                   artists: item.track.artists.map((artist: any) => {
