@@ -13,7 +13,9 @@ declare global {
 export default function Home() {
   const { update, data, status } = useSession();
   const { token: mkToken, setToken: setMKToken } = useContext(MusicKitContext);
-  const { token: mkDevToken } = useContext(DeveloperTokenContext);
+  const { token: mkDevToken, setToken: setDevToken } = useContext(
+    DeveloperTokenContext
+  );
   const [playlists, setPlaylists] = useState<any[]>([]);
 
   const cursorRef = useRef<HTMLHeadingElement>(null);
@@ -26,9 +28,18 @@ export default function Home() {
   const signInWithApple = () => {
     // @ts-ignore
     const music = window.MusicKit.getInstance();
-    music.authorize().then((userToken: string) => {
+    if (music.isAuthorized) {
+      const userToken = music.api.userToken as string;
+      const developerToken = music.api._developerToken.token as string;
       setMKToken(userToken);
-    });
+      setDevToken(developerToken);
+    } else {
+      music.authorize().then((userToken: string) => {
+        const developerToken = music.api._developerToken.token as string;
+        setMKToken(userToken);
+        setDevToken(developerToken);
+      });
+    }
   };
 
   useEffect(() => {
