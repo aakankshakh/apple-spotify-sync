@@ -5,6 +5,11 @@ import Script from "next/script";
 import "@/styles/globals.css";
 import { MusicKitProvider } from "@/lib/client/MusicKitContext";
 
+import { Montserrat } from "next/font/google";
+
+// If loading a variable font, you don't need to specify the font weight
+const montserrat = Montserrat({ subsets: ["latin"] });
+
 export default function App({
   Component,
   pageProps: { session, ...pageProps },
@@ -41,7 +46,9 @@ export default function App({
       `}</Script>
       <MusicKitProvider>
         <SessionProvider session={session}>
-          <Component {...pageProps} />
+          <div className={montserrat.className}>
+            <Component {...pageProps} />
+          </div>
         </SessionProvider>
       </MusicKitProvider>
     </>
