@@ -74,16 +74,29 @@ const getSpotifyPlaylists = async (userToken: string, page: number = 0) => {
     .then((res) => res.json())
     .then((data) => data.items)
     .then((playlists) =>
-      playlists.map((playlist: SpotifyPlaylist) => {
-        // for each one, use the tracks endpoint to get the associated tracks
+      playlists.map((playlist: SpotifyPlaylist) =>
         fetch(`${playlist.tracks.href}?fields=${fields}`, {
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
         })
           .then((res) => res.json())
-          .then((data) => {});
-      })
+          .then((data) => {
+            return {
+              ...playlist,
+              tracks: data.items.map((item: any) => {
+                return {
+                  id: item.track.id,
+                  name: item.track.name,
+                  artists: item.track.artists.map((artist: any) => {
+                    return artist.name;
+                  }),
+                  duration_ms: item.track.duration_ms,
+                };
+              }),
+            };
+          })
+      )
     )
     .catch((err) => console.error(err));
 };

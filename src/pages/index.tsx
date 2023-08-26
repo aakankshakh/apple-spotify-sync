@@ -34,12 +34,12 @@ export default function Home() {
     if (mkToken && mkDevToken) {
       getUserPlaylists("apple", mkToken, mkDevToken);
     } else if (status === "authenticated") {
-      console.log(data);
       // @ts-ignore
       getUserPlaylists("spotify", data.access_token, "").then((playlists) => {
-        // @ts-ignore
-        setPlaylists(playlists);
-        console.log(playlists);
+        if (!playlists) return;
+        Promise.all(playlists).then((playlists) => {
+          setPlaylists(playlists);
+        });
       });
     }
   }, [mkToken, data, mkDevToken, status]);
@@ -172,28 +172,23 @@ export default function Home() {
                 Sign out
               </button>
             </div>
-            <table className="table-auto">
-              <thead>
-                <tr>
-                  <th className="px-4 py-2"></th>
-                  <th className="px-4 py-2">Name</th>
-                </tr>
-              </thead>
-              <tbody>
-                {playlists.map((playlist, idx) => (
-                  <tr key={idx}>
-                    <td className="border px-4 py-2">
-                      <img
-                        alt={playlist.name}
-                        className="w-5 h-5 rounded-sm"
-                        src={playlist.images[0].url}
-                      />
-                    </td>
-                    <td className="border px-4 py-2">{playlist.name}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div className="grid grid-cols-3 gap-4">
+              {playlists.map((playlist, idx) => (
+                <div
+                  key={idx}
+                  className="p-4 rounded-lg bg-transparent hover:bg-white/30 cursor-pointer"
+                >
+                  <img
+                    alt={playlist.name}
+                    className="w-full h-48 object-cover object-center mb-3 rounded-lg"
+                    src={playlist.images[0].url}
+                  />
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    {playlist.name}
+                  </h2>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
