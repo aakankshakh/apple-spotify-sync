@@ -1,6 +1,8 @@
+import { DeveloperTokenContext } from "@/lib/client/DeveloperTokenContext";
 import { MusicKitContext } from "@/lib/client/MusicKitContext";
+import { getUserPlaylists } from "@/lib/client/playlist";
 import { useSession, signIn, signOut } from "next-auth/react";
-import { useContext, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 declare global {
   interface WindowEventMap {
     musickitloaded: CustomEvent;
@@ -9,7 +11,10 @@ declare global {
 
 export default function Home() {
   const { update, data, status } = useSession();
-  const { token, setToken } = useContext(MusicKitContext);
+  const { token: mkToken, setToken: setMKToken } = useContext(MusicKitContext);
+  const { token: mkDevToken } = useContext(DeveloperTokenContext);
+  const [playlists, setPlaylists] = useState<any[]>([]);
+
   const cursorRef = useRef<HTMLHeadingElement>(null);
   setTimeout(() => {
     if (cursorRef.current) {
@@ -21,9 +26,22 @@ export default function Home() {
     // @ts-ignore
     const music = window.MusicKit.getInstance();
     music.authorize().then((userToken: string) => {
-      setToken(userToken);
+      setMKToken(userToken);
     });
   };
+
+  useEffect(() => {
+    if (mkToken && mkDevToken) {
+      getUserPlaylists("apple", mkToken, mkDevToken);
+    } else if (status === "authenticated") {
+      console.log(data);
+      // @ts-ignore
+      getUserPlaylists("spotify", data.access_token, "").then((playlists) => {
+        // @ts-ignore
+        setPlaylists(playlists);
+      });
+    }
+  }, [mkToken, data, mkDevToken, status]);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24">
@@ -86,7 +104,7 @@ export default function Home() {
           Share your favourite playlist with your friends and have it sync
           almost instantaneously!
         </p>
-        {!token && status === "unauthenticated" ? (
+        {!mkToken && status === "unauthenticated" ? (
           <div>
             <button
               type="button"
@@ -130,28 +148,38 @@ export default function Home() {
             </button>
           </div>
         ) : (
-          <div>
-            <button className="text-white bg-orange-600 hover:bg-orange-700 focus:ring-4 focus:ring-orange-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center m-3">
-              SYNC A Playlist
-            </button>
-            <button
-              type="button"
-              className="text-white bg-[#050708] dark:bg-[#777474] hover:bg-[#050708]/90 dark:hover:bg-[#777474]/60 focus:ring-4 focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#050708]/50 m-3"
-              onClick={() => {
-                if (token) {
-                  setToken(undefined);
-                  // @ts-ignore
-                  const music = window.MusicKit.getInstance();
-                  music.unauthorize();
-                }
-                if (status !== "unauthenticated") {
-                  signOut();
-                }
-              }}
-            >
-              Sign out
-            </button>
-          </div>
+          <>
+            <div>
+              <button className="text-white bg-orange-600 hover:bg-orange-700 focus:ring-4 focus:ring-orange-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center m-3">
+                SYNC A Playlist
+              </button>
+              <button
+                type="button"
+                className="text-white bg-[#050708] dark:bg-[#777474] hover:bg-[#050708]/90 dark:hover:bg-[#777474]/60 focus:ring-4 focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#050708]/50 m-3"
+                onClick={() => {
+                  if (mkToken) {
+                    setMKToken(undefined);
+                    // @ts-ignore
+                    const music = window.MusicKit.getInstance();
+                    music.unauthorize();
+                  }
+                  if (status !== "unauthenticated") {
+                    signOut();
+                  }
+                }}
+              >
+                Sign out
+              </button>
+            </div>
+            <div className="text-center">
+              {/*Add a table of playlists here with a button to sync them*/}
+              <ul className="space-y-2">
+                {playlists.map((playlist) => (
+                  <li key={playlist.id}>{JSON.stringify(playlist)}</li>
+                ))}
+              </ul>
+            </div>
+          </>
         )}
       </div>
     </main>
