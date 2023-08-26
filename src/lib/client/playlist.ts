@@ -9,14 +9,19 @@ export const getUserPlaylists = async (
 };
 
 const getApplePlaylists = async (userToken: string, devToken: string) => {
-  return fetch("https://api.music.apple.com/v1/me/library/playlists", {
-    headers: {
-      Authorization: `Bearer ${devToken}`,
-      "Music-User-Token": userToken,
-    },
-  })
+  const relations = encodeURI("entries,artwork");
+  return fetch(
+    `https://api.music.apple.com/v1/me/library/playlists?include=${relations}`,
+    {
+      headers: {
+        Authorization: `Bearer ${devToken}`,
+        "Music-User-Token": userToken,
+      },
+    }
+  )
     .then((res) => res.json())
-    .then((data) => console.log(data))
+    .then((data) => data.data)
+    .then((playlists) => {})
     .catch((err) => console.error(err));
 };
 
