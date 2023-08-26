@@ -55,7 +55,7 @@ export default function PlaylistPage() {
               Playlist
             </h4>
             <div className="flex flex-row justify-between">
-              <h1 className="mt-0 mb-2 text-black dark:text-white text-4xl">
+              <h1 className="mt-0 mb-2 text-black font-semibold dark:text-white text-4xl">
                 {playlist.name}
               </h1>
               <div className="justify-items-end">

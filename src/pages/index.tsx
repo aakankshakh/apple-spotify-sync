@@ -45,7 +45,7 @@ export default function Home() {
   }, [mkToken, data, mkDevToken, status]);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
+    <main className="flex min-h-screen flex-col items-center justify-center p-24 ">
       <div className="h-20 w-20">
         <svg
           className="fill-black dark:fill-white "
@@ -91,7 +91,7 @@ export default function Home() {
       </div>
       <div className="text-center">
         <div className="flex flex-row items-center justify-center space-x-0">
-          <h1 className="text-6xl inline-flex h-20 pt-2 overflow-x-hidden animate-type group-hover:animate-type-reverse whitespace-nowrap text-brand-accent will-change-transform">
+          <h1 className="text-6xl font-semibold inline-flex h-20 pt-2 overflow-x-hidden animate-type group-hover:animate-type-reverse whitespace-nowrap text-brand-accent will-change-transform">
             Playlist Sync
           </h1>
           <h1
