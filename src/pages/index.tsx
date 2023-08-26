@@ -17,20 +17,15 @@ export default function Home() {
     }
   }, 3000);
 
-  useEventListener("musickitloaded", () => {
-    fetch("/api/token")
-      .then((res) => res.json())
-      .then(({ token }: { token: string }) => {
-        // @ts-ignore
-        window.MusicKit.configure({
-          developerToken: token,
-          app: {
-            name: "MusicKit Web App",
-            build: "1978.4.1",
-          },
-        });
-      });
-  });
+  const signInWithApple = () => {
+    // @ts-ignore
+    console.log(window.MusicKit);
+    // @ts-ignore
+    const music = window.MusicKit.getInstance();
+    music.authorize().then((userToken: string) => {
+      console.log(userToken);
+    });
+  };
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24">
@@ -97,6 +92,7 @@ export default function Home() {
           <button
             type="button"
             className="text-white bg-[#050708] dark:bg-[#777474] hover:bg-[#050708]/90 dark:hover:bg-[#777474]/60 focus:ring-4 focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#050708]/50 m-3"
+            onClick={() => signInWithApple()}
           >
             <svg
               className="mr-2 -ml-1 w-5 h-5"

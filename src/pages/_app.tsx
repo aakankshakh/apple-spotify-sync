@@ -22,16 +22,6 @@ export default function App({
                     build: "1978.4.1",
                   },
                 });
-
-                const music = MusicKit.getInstance();
-                music.authorize()
-                .then((userToken) => {
-                  // add an element to the DOM with the user token
-                  const userTokenElement = document.createElement("div");
-                  userTokenElement.id = "user-token";
-                  userTokenElement.innerText = userToken;
-                  document.body.appendChild(userTokenElement);
-                });
               });
           });
       `}</Script>
