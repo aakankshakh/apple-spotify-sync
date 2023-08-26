@@ -1,7 +1,9 @@
-import "@/styles/globals.css";
 import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
 import Script from "next/script";
+
+import "@/styles/globals.css";
+import { MusicKitProvider } from "@/lib/client/MusicKitContext";
 
 export default function App({
   Component,
@@ -19,15 +21,17 @@ export default function App({
                   developerToken: token,
                   app: {
                     name: "Playlist Sync",
-                    build: "1978.4.1",
+                    build: "0.0.1",
                   },
                 });
               });
           });
       `}</Script>
-      <SessionProvider session={session}>
-        <Component {...pageProps} />
-      </SessionProvider>
+      <MusicKitProvider>
+        <SessionProvider session={session}>
+          <Component {...pageProps} />
+        </SessionProvider>
+      </MusicKitProvider>
     </>
   );
 }
