@@ -1,3 +1,18 @@
+export type Platform = "apple" | "spotify";
+export type UnifiedSong = {
+  artists: string[];
+  id: string;
+  name: string;
+  type: Platform;
+};
+export type UnifiedPlaylist = {
+  id: string;
+  imageURL?: string;
+  name: string;
+  songs?: song[];
+  type: Platform;
+};
+
 export type playlist = {
   id: string;
   name: string;

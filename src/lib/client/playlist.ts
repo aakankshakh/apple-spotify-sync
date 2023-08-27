@@ -1,19 +1,5 @@
-import { song } from "@/types";
+import { Platform, UnifiedPlaylist, UnifiedSong } from "@/types";
 
-type Platform = "apple" | "spotify";
-export type UnifiedSong = {
-  artists: string[];
-  id: string;
-  name: string;
-  type: Platform;
-};
-export type UnifiedPlaylist = {
-  id: string;
-  imageURL: string;
-  name: string;
-  tracks?: song[];
-  type: Platform;
-};
 export const getUserPlaylists = async (
   type: Platform,
   token: string,
@@ -25,29 +11,55 @@ export const getUserPlaylists = async (
 };
 
 type ApplePlaylist = {
-  next: string;
-  data: {
-    id: string;
-    type: "library-playlists";
-    href: string;
-    attributes: {
-      lastModifiedDate: string;
-      canEdit: boolean;
-      name: string;
-      isPublic: boolean;
-      hasCatalog: boolean;
-      dateAdded: string;
-      playParams: {
-        id: string;
-        kind: "playlist";
-        isLibrary: boolean;
-        globalId: string;
-      };
+  id: string;
+  type: string;
+  href: string;
+  attributes: {
+    lastModifiedDate: string;
+    canEdit: boolean;
+    name: string;
+    isPublic: boolean;
+    hasCatalog: boolean;
+    dateAdded: string;
+    playParams: {
+      id: string;
+      kind: string;
+      isLibrary: boolean;
+      globalId: string;
     };
-  }[];
+    artwork?: {
+      width: number | null;
+      height: number | null;
+      url: string;
+    };
+  };
+};
+type ApplePlaylists = {
+  next: string;
+  data: ApplePlaylist[];
   meta: {
     total: number;
   };
+};
+const transformApplePlaylists = (
+  playlists: ApplePlaylist[]
+): UnifiedPlaylist[] => {
+  playlists.sort((a, b) => {
+    let dateA = new Date(a.attributes.lastModifiedDate);
+    let dateB = new Date(b.attributes.lastModifiedDate);
+    return dateA.getTime() - dateB.getTime();
+  });
+  return playlists.map((playlist) => {
+    const transformedPlaylist: UnifiedPlaylist = {
+      id: playlist.id,
+      imageURL: playlist.attributes.artwork
+        ? playlist.attributes.artwork.url
+        : undefined,
+      name: playlist.attributes.name,
+      type: "apple",
+    };
+    return transformedPlaylist;
+  });
 };
 const getApplePlaylists = async (
   userToken: string,
@@ -63,13 +75,13 @@ const getApplePlaylists = async (
     }
   )
     .then((res) => res.json())
+    .then((json) => json as ApplePlaylists)
     .then((data) => data.data)
-    .then((playlists: ApplePlaylist[]) => {
-      playlists.map((playlist) => {
-        console.log(playlist);
-      });
-    })
-    .catch((err) => console.error(err));
+    .then((playlists) => transformApplePlaylists(playlists))
+    .catch((err) => {
+      console.error(err);
+      return [];
+    });
 };
 
 type SpotifyPlaylist = {
@@ -109,6 +121,20 @@ type SpotifyPlaylist = {
   type: string;
   uri: string;
 };
+const transformSpotifyPlaylists = (
+  playlists: SpotifyPlaylist[]
+): UnifiedPlaylist[] => {
+  return playlists.map((playlist: SpotifyPlaylist) => {
+    const transformedPlaylist: UnifiedPlaylist = {
+      id: playlist.id,
+      imageURL: playlist.images.length > 0 ? playlist.images[0].url : undefined,
+      name: playlist.name,
+      type: "spotify",
+    };
+
+    return transformedPlaylist;
+  });
+};
 const getSpotifyPlaylists = async (
   userToken: string,
   page: number = 0
@@ -117,9 +143,6 @@ const getSpotifyPlaylists = async (
   const composed_url = `https://api.spotify.com/v1/me/playlists?offset=${
     50 * page
   }&limit=${per_page}`;
-  const fields = encodeURI(
-    "items(added_at,track(id, artists(name), duration_ms, name))"
-  );
 
   return fetch(composed_url, {
     headers: {
@@ -128,33 +151,9 @@ const getSpotifyPlaylists = async (
   })
     .then((res) => res.json())
     .then((data) => data.items)
-    .then((playlists) =>
-      playlists.map((playlist: SpotifyPlaylist) =>
-        fetch(`${playlist.tracks.href}?fields=${fields}`, {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            const transformedPlaylist: UnifiedPlaylist = {
-              id: playlist.id,
-              imageURL: playlist.images[0].url,
-              songs: data.items.map((item) => {
-                const transformedSong: UnifiedSong = {
-                  id: item.track.id,
-                  name: item.track.name,
-                  artists: item.track.artists.map((artist: any) => {
-                    return artist.name;
-                  }),
-                  duration_ms: item.track.duration_ms,
-                };
-              }),
-            };
-
-            return newPlaylist;
-          })
-      )
-    )
-    .catch((err) => console.error(err));
+    .then((playlists) => transformSpotifyPlaylists(playlists))
+    .catch((err) => {
+      console.error(err);
+      return [];
+    });
 };

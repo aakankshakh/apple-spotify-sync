@@ -44,15 +44,14 @@ export default function Home() {
 
   useEffect(() => {
     if (mkToken && mkDevToken) {
-      getUserPlaylists("apple", mkToken, mkDevToken);
+      getUserPlaylists("apple", mkToken, mkDevToken).then((playlists) =>
+        setPlaylists(playlists)
+      );
     } else if (status === "authenticated") {
       // @ts-ignore
-      getUserPlaylists("spotify", data.access_token, "").then((playlists) => {
-        if (!playlists) return;
-        Promise.all(playlists).then((playlists) => {
-          setPlaylists(playlists);
-        });
-      });
+      getUserPlaylists("spotify", data.access_token, "").then((playlists) =>
+        setPlaylists(playlists)
+      );
     }
   }, [mkToken, data, mkDevToken, status]);
 
