@@ -47,7 +47,7 @@ const transformApplePlaylists = (
   playlists.sort((a, b) => {
     let dateA = new Date(a.attributes.lastModifiedDate);
     let dateB = new Date(b.attributes.lastModifiedDate);
-    return dateA.getTime() - dateB.getTime();
+    return dateB.getTime() - dateA.getTime();
   });
   return playlists.map((playlist) => {
     const transformedPlaylist: UnifiedPlaylist = {
@@ -66,7 +66,7 @@ const getApplePlaylists = async (
   devToken: string
 ): Promise<UnifiedPlaylist[]> => {
   return fetch(
-    `https://api.music.apple.com/v1/me/library/playlists?extend=attributes`,
+    `https://api.music.apple.com/v1/me/library/playlists?extend=attributes&limit=100`,
     {
       headers: {
         Authorization: `Bearer ${devToken}`,
