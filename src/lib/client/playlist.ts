@@ -66,7 +66,7 @@ const getApplePlaylists = async (
   devToken: string
 ): Promise<UnifiedPlaylist[]> => {
   return fetch(
-    `https://api.music.apple.com/v1/me/library/playlists?extend=attributes`,
+    `https://api.music.apple.com/v1/me/library/playlists?extend=attributes&limit=100`,
     {
       headers: {
         Authorization: `Bearer ${devToken}`,
