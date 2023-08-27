@@ -9,7 +9,7 @@ export type UnifiedPlaylist = {
   id: string;
   imageURL?: string;
   name: string;
-  songs?: song[];
+  songs?: UnifiedSong[];
   type: Platform;
 };
 
