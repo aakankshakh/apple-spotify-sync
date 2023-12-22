@@ -1,9 +1,15 @@
-import { ResponseObject, WithOptional, playlist } from "@/types";
+import {
+  ResponseObject,
+  UnifiedPlaylist,
+  WithOptional,
+  playlistDBEntry,
+  sync,
+} from "@/types";
 
 export const createPlaylist = async (
-  playlistData: WithOptional<playlist, "id">,
+  playlistData: Pick<playlistDBEntry, "playlist">,
   onError: (err: string) => void,
-  onSuccess: (playlist: playlist) => void
+  onSuccess: (playlist: playlistDBEntry) => void
 ) => {
   const res = await fetch("/api/playlist", {
     method: "POST",
@@ -26,7 +32,7 @@ export const createPlaylist = async (
 export const getPlaylist = async (
   id: string,
   onError: (err: string) => void,
-  onSuccess: (playlist: playlist) => void
+  onSuccess: (playlist: playlistDBEntry) => void
 ) => {
   const res = await fetch(`/api/playlist?id=${id}`);
   const data = (await res.json()) as ResponseObject;
@@ -41,36 +47,25 @@ export const getPlaylist = async (
   }
 };
 
-export const createTest = async () => {
-  createPlaylist(
-    {
-      name: "Test playlist",
-      songs: [
-        {
-          name: "Washing Machine Heart",
-          albumImage: "",
-          artist: "Mitski",
-          duration: 128,
-        },
-        {
-          name: "The Less I Know The Better",
-          albumImage: "",
-          artist: "Tame Impala",
-          duration: 167,
-        },
-        {
-          name: "Freaking Out The Neighborhood",
-          albumImage: "",
-          artist: "Mac DeMarco",
-          duration: 218,
-        },
-      ],
-      owner_id: "calum",
-      created_at: new Date(),
-      updated_at: new Date(),
-      deleted_at: undefined,
+export const createSync = async (
+  syncData: sync,
+  onError: (err: string) => void,
+  onSuccess: () => void
+) => {
+  const res = await fetch("/api/sync", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
     },
-    (err) => console.log(err),
-    (playlist) => console.log(playlist)
-  );
+    body: JSON.stringify(syncData),
+  });
+  const data = (await res.json()) as ResponseObject;
+
+  if (data.error !== undefined) {
+    onError(data.error);
+  } else if (data.object !== "sync") {
+    onError("Received non-sync object");
+  } else {
+    onSuccess();
+  }
 };

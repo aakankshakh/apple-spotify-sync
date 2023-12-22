@@ -1,10 +1,10 @@
-import { UnifiedPlaylist, UnifiedSong } from "@/types";
+import { Provider, UnifiedPlaylist, UnifiedSong } from "@/types";
 
 const hashPlaylist = async (playlist: UnifiedPlaylist): Promise<string> => {
   const playlistMinusUniqueFields: UnifiedPlaylist = {
     ...playlist,
     id: "temp",
-    type: "spotify",
+    provider: Provider.spotify,
   };
 
   const jsonStr = JSON.stringify(playlistMinusUniqueFields);

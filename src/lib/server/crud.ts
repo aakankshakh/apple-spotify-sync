@@ -1,40 +1,63 @@
 import { kv } from "@vercel/kv";
-import { playlist, sync } from "@/types";
+import { playlistDBEntry, ResponseObject, sync } from "@/types";
 
-export async function createPlaylist(playlist: playlist): Promise<void> {
+const errRes = (
+  error: string,
+  object: "playlist" | "sync" | "song"
+): ResponseObject => {
+  return {
+    object,
+    data: undefined,
+    error: "Error: " + error,
+  };
+};
+const falseRes = (error: string): ResponseObject => {
+  return {
+    object: "boolean",
+    success: false,
+    error: "Error: " + error,
+  };
+};
+const trueRes = (): ResponseObject => {
+  return {
+    object: "boolean",
+    success: true,
+    error: undefined,
+  };
+};
+
+export async function createPlaylist(
+  playlist: playlistDBEntry
+): Promise<ResponseObject> {
   try {
     await kv.set(`playlist:${playlist.id}`, playlist);
-  } catch (error) {
-    // Handle errors
+    return {
+      object: "playlist",
+      data: playlist,
+      error: undefined,
+    };
+  } catch (error: any) {
+    return errRes(error, "playlist");
   }
 }
 
 /**
  * Retrieve an existing playlist from the database
  */
-export async function getPlaylist(id: string): Promise<playlist | undefined> {
+export async function getPlaylist(id: string): Promise<ResponseObject> {
   try {
-    const playlistData = await kv.get<playlist>(`playlist:${id}`);
-    return playlistData ? playlistData : undefined;
-  } catch (error) {
-    // Handle errors
-    return undefined;
-  }
-}
-
-/**
- * Soft delete a playlist by setting the deleted_at field to the current date.
- */
-export async function deletePlaylist(id: string): Promise<void> {
-  try {
-    const today = new Date();
-    const playlist = await getPlaylist(id);
-    if (playlist) {
-      const newPlaylist = { ...playlist, deleted_at: today };
-      await kv.set(`playlist:${id}`, newPlaylist);
+    const playlistData = await kv.get<playlistDBEntry>(`playlist:${id}`);
+    if (!playlistData) {
+      return errRes("Playlist not found", "playlist");
     }
+
+    return {
+      object: "playlist",
+      data: playlistData,
+      error: undefined,
+    };
   } catch (error) {
-    // Handle errors
+    return errRes(error as string, "playlist");
   }
 }
 
@@ -43,43 +66,85 @@ export async function deletePlaylist(id: string): Promise<void> {
  */
 export async function updatePlaylist(
   id: string,
-  updatedPlaylist: Partial<playlist>
-): Promise<void> {
+  updatedPlaylist: Partial<playlistDBEntry>
+): Promise<ResponseObject> {
   try {
-    const currentPlaylist = await getPlaylist(id);
-    if (currentPlaylist) {
-      const newPlaylist = { ...currentPlaylist, ...updatedPlaylist };
-      await kv.set(`playlist:${id}`, newPlaylist);
+    const currentPlaylistRes = (await getPlaylist(id)) as ResponseObject & {
+      object: "playlist";
+    };
+    if (currentPlaylistRes.error !== undefined) {
+      return errRes(currentPlaylistRes.error, "playlist");
     }
+    const currentPlaylist = currentPlaylistRes.data;
+
+    const newPlaylist = {
+      ...currentPlaylist,
+      ...updatedPlaylist,
+    } as playlistDBEntry;
+    await kv.set(`playlist:${id}`, newPlaylist);
+
+    return {
+      object: "playlist",
+      data: newPlaylist,
+      error: undefined,
+    };
   } catch (error) {
-    // Handle errors
+    return errRes(error as string, "playlist");
+  }
+}
+
+/**
+ * Soft delete a playlist by setting the deleted_at field to the current date.
+ */
+export async function deletePlaylist(id: string): Promise<ResponseObject> {
+  try {
+    const today = new Date();
+    const playlist = await getPlaylist(id);
+    if (playlist.error) {
+      return falseRes(playlist.error);
+    }
+
+    const newPlaylist = { ...playlist, deleted_at: today };
+    await kv.set(`playlist:${id}`, newPlaylist);
+    return trueRes();
+  } catch (error) {
+    return errRes(error as string, "playlist");
   }
 }
 
 /**
  * Create a new sync in the database
  */
-export async function createSync(sync: sync): Promise<void> {
+export async function createSync(sync: sync): Promise<ResponseObject> {
   try {
     await kv.set(`sync:${sync.playlist_id}`, sync);
+    return {
+      object: "sync",
+      data: sync,
+      error: undefined,
+    };
   } catch (error) {
-    // Handle errors
+    return errRes(error as string, "sync");
   }
 }
 
 /**
- * Soft delete a sync by setting the deleted_at field to the current date.
+ * Retrieve an existing sync from the database
  */
-export async function deleteSync(playlist_id: string): Promise<void> {
+export async function getSync(playlist_id: string): Promise<ResponseObject> {
   try {
-    const today = new Date();
-    const sync = await getSync(playlist_id);
-    if (sync) {
-      const newSync = { ...sync, deleted_at: today };
-      await kv.set(`sync:${playlist_id}`, newSync);
+    const syncData = await kv.get<sync>(`sync:${playlist_id}`);
+    if (!syncData) {
+      return errRes("Sync not found", "sync");
     }
+
+    return {
+      object: "sync",
+      data: syncData,
+      error: undefined,
+    };
   } catch (error) {
-    // Handle errors
+    return errRes(error as string, "sync");
   }
 }
 
@@ -89,27 +154,43 @@ export async function deleteSync(playlist_id: string): Promise<void> {
 export async function updateSync(
   playlist_id: string,
   updatedSync: Partial<sync>
-): Promise<void> {
+): Promise<ResponseObject> {
   try {
-    const currentSync = await getSync(playlist_id);
-    if (currentSync) {
-      const newSync = { ...currentSync, ...updatedSync };
-      await kv.set(`sync:${playlist_id}`, newSync);
+    const currentSyncRes = (await getSync(playlist_id)) as ResponseObject & {
+      object: "sync";
+    };
+    if (currentSyncRes.error !== undefined) {
+      return errRes("Sync not found", "sync");
     }
+
+    const newSync = { ...currentSyncRes.data, ...updatedSync } as sync;
+    await kv.set(`sync:${playlist_id}`, newSync);
+
+    return {
+      object: "sync",
+      data: newSync,
+      error: undefined,
+    };
   } catch (error) {
-    // Handle errors
+    return errRes(error as string, "sync");
   }
 }
 
 /**
- * Retrieve an existing sync from the database
+ * Soft delete a sync by setting the deleted_at field to the current date.
  */
-export async function getSync(playlist_id: string): Promise<sync | undefined> {
+export async function deleteSync(playlist_id: string): Promise<ResponseObject> {
   try {
-    const syncData = await kv.get<sync>(`sync:${playlist_id}`);
-    return syncData ? syncData : undefined;
+    const today = new Date();
+    const sync = await getSync(playlist_id);
+    if (sync.error) {
+      return falseRes(sync.error);
+    }
+
+    const newSync = { ...sync, deleted_at: today };
+    await kv.set(`sync:${playlist_id}`, newSync);
+    return trueRes();
   } catch (error) {
-    // Handle errors
-    return undefined;
+    return falseRes(error as string);
   }
 }

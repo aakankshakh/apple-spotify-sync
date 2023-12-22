@@ -1,24 +1,35 @@
-import { playlist } from "@/types";
+import { playlistDBEntry } from "@/types";
 import dateFormat from "dateformat";
 import React from "react";
 import SongList from "@/components/song-list";
 
 type PlaylistPageProps = {
   error: string | undefined;
-  playlist: playlist | undefined;
+  playlist: playlistDBEntry | undefined;
 };
 
 export const PlaylistPreview = (props: PlaylistPageProps) => {
   const { error, playlist } = props;
-  const numSongs = playlist?.songs.length || 0;
+  if (!playlist || !playlist.playlist || !playlist.playlist.songs) {
+    return (
+      <>
+        <h1 className="text-3xl">Error: {error}</h1>
+      </>
+    );
+  }
+
+  const numSongs = playlist.playlist.songs.length;
+  /*
   const totalDuration =
-    playlist?.songs
+    playlist.playlist.songs
       .map((song) => song.duration)
       .reduce((partialSum, a) => partialSum + a, 0) || 0;
 
   const durationHours = Math.floor(totalDuration / 3600);
   const durationMinutes = Math.round((totalDuration % 3600) / 60);
   const formattedDuration = `${durationHours} hr ${durationMinutes} min`;
+  */
+
   return (
     <main className="p-24 w-screen">
       {error && <h1 className="text-3xl">Error: {error}</h1>}
@@ -29,7 +40,7 @@ export const PlaylistPreview = (props: PlaylistPageProps) => {
           </h4>
           <div className="flex flex-row justify-between">
             <h1 className="mt-0 mb-2 text-black font-semibold dark:text-white text-4xl">
-              {playlist.name}
+              {playlist.playlist.name}
             </h1>
             <div className="justify-items-end">
               <button className="font-semibold mr-2 inline-flex bg-yellow-600 text-white items-center py-1 px-4 rounded-full gap-x-2 hover:bg-yellow-800">
@@ -48,7 +59,7 @@ export const PlaylistPreview = (props: PlaylistPageProps) => {
             </div>
           </div>
           <p className="text-gray-600 text-m">
-            {numSongs} songs, {formattedDuration}
+            {numSongs} songs {/*, {formattedDuration} */}
           </p>
           <p className="text-gray-600 text-sm pb-5">
             Last synced:{" "}
@@ -59,7 +70,7 @@ export const PlaylistPreview = (props: PlaylistPageProps) => {
       */}
           </p>
 
-          <SongList songs={playlist.songs} />
+          <SongList songs={playlist.playlist.songs} />
         </div>
       )}
     </main>

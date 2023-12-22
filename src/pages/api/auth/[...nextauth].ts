@@ -1,5 +1,4 @@
-import NextAuth, { Account, Profile, Session, User } from "next-auth";
-import { AdapterAccount } from "next-auth/adapters";
+import NextAuth, { Account, Profile, Session } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import SpotifyProvider from "next-auth/providers/spotify";
 
@@ -17,20 +16,31 @@ export const authOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, account }: { token: JWT; account: Account | null }) {
-      if (account) {
-        token = Object.assign({}, token, {
-          access_token: account.access_token,
-        });
+    async jwt({
+      token,
+      account,
+      profile,
+    }: {
+      token: JWT;
+      account: Account | null;
+      profile?: Profile | null;
+    }) {
+      if (!account || !profile || !account.access_token) {
+        return token;
       }
+
+      token.accessToken = account.access_token;
+
+      if (!profile || !profile.sub) {
+        return token;
+      }
+
+      token.id = profile.sub;
       return token;
     },
     async session({ session, token }: { session: Session; token: JWT }) {
-      if (session) {
-        session = Object.assign({}, session, {
-          access_token: token.access_token,
-        });
-      }
+      session.accessToken = token.accessToken;
+      session.id = token.id;
       return session;
     },
   },

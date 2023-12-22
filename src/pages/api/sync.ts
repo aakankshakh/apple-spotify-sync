@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { ResponseObject, playlist, sync } from "@/types";
+import { ResponseObject, playlistDBEntry, sync } from "../../types/index";
 
 export default async function handler(
   req: NextApiRequest,
