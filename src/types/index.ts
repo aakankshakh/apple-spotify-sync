@@ -1,7 +1,5 @@
 import {
-  ApplePlaylist,
   ApplePlaylistsResponse,
-  AppleSong,
   AppleSongsResponse,
   AppleTokens,
   AppleTransforms,
@@ -9,9 +7,7 @@ import {
 } from "./apple";
 import {
   BuildSpotifyProvider,
-  SpotifyPlaylist,
   SpotifyPlaylistsResponse,
-  SpotifySong,
   SpotifySongsResponse,
   SpotifyTokens,
   SpotifyTransforms,
