@@ -31,34 +31,49 @@ export const MusicAPIContext = createContext<MusicAPIProviderType>({
   trigger: 0,
 });
 
-const checkIsSignedInToApple = (music: MusicKit.MusicKitInstance) => {
-  if (!music.isAuthorized) {
+const updateProvider = (
+  session: Session | null,
+  status: AuthStatus,
+  musickit: MusicKit.MusicKitInstance | undefined = undefined
+) => {
+  if (!session || status !== "authenticated") {
     return;
   }
 
-  const userToken = music.musicUserToken as string;
-  const developerToken = music.developerToken as string;
-
-  const provider = new AppleMusicProvider({
-    accessToken: userToken,
-    developerToken: developerToken,
-  });
-  return provider;
-};
-
-const checkIsSignedInToSpotify = (data: Session | null, status: AuthStatus) => {
-  // Check if signed in to Spotify
-  if (status !== "authenticated" || !data) {
-    return;
+  // Credentials provider (which we use for Apple Music) seems to break the types, and returns:
+  // {
+  //    expires: date,
+  //    user: {
+  //       name: string,
+  //       email: string,
+  //    }
+  // }
+  // Let's check for the existance of the user property to determine if we are using the Apple Music provider.
+  if ("user" in session && musickit) {
+    console.log("Apple Music provider detected!");
+    return buildProvider({
+      provider: Provider.apple,
+      tokens: {
+        accessToken: musickit.musicUserToken,
+        developerToken: musickit.developerToken,
+      },
+    });
   }
 
-  const provider = buildProvider({
-    provider: Provider.spotify,
-    tokens: {
-      accessToken: data.accessToken,
-    },
-  });
-  return provider;
+  const { accessToken, provider: providerId } = session;
+  console.log("accessToken:", accessToken);
+  console.log("providerId:", providerId);
+  switch (providerId) {
+    case "spotify":
+      return buildProvider({
+        provider: Provider.spotify,
+        tokens: {
+          accessToken: accessToken,
+        },
+      });
+    default:
+      return;
+  }
 };
 
 export const MusicAPI = (props: { children: React.ReactNode }) => {
@@ -73,23 +88,17 @@ export const MusicAPI = (props: { children: React.ReactNode }) => {
 
   // Signed in checks and provider construction
   const updateProviders = useCallback(() => {
-    const currentProvider = provider?.provider;
+    console.log("Status:", status);
     const music = window.MusicKit.getInstance();
-
-    let appleProvider = checkIsSignedInToApple(music);
-    let spotifyProvider = checkIsSignedInToSpotify(data, status);
-
-    if (appleProvider && currentProvider !== Provider.apple) {
-      setProvider(appleProvider);
-    } else if (spotifyProvider && currentProvider !== Provider.spotify) {
-      setProvider(spotifyProvider);
-    }
-  }, [data, provider?.provider, status]);
+    const provider = updateProvider(data, status, music);
+    console.log("New povider:", provider);
+    setProvider(provider);
+  }, [data, status]);
 
   useEffect(() => {
     setTimeout(() => {
       updateProviders();
-    }, 100);
+    }, 250);
   }, [updateProviders, trigger]);
 
   return (

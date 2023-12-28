@@ -17,6 +17,8 @@ declare module "next-auth" {
     accessToken: string;
     /** The user's id (sub) from the upstream OAuth provider. */
     id: string;
+    /** id of the provider used for this account */
+    provider: string;
   }
 }
 
@@ -26,5 +28,7 @@ declare module "next-auth/jwt" {
     accessToken: string;
     /** The user's id (sub) from the upstream OAuth provider. */
     id: string;
+    /** id of the provider used for this account */
+    provider: string;
   }
 }

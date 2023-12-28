@@ -16,9 +16,16 @@ export default function Home() {
 
   const signInWithApple = () => {
     const music = window.MusicKit.getInstance();
-    music.authorize().then(() => {
-      setTrigger((prev) => prev + 1);
-    });
+    music
+      .authorize()
+      .then((token: string) => {
+        return signIn("applemusic", {
+          token,
+        });
+      })
+      .then(() => {
+        setTrigger((prev) => prev + 1);
+      });
   };
 
   const signInWithSpotify = () => {
